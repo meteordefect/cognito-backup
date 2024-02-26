@@ -11,9 +11,10 @@ exports.handler = async (event) => {
 
   try {
     // Perform the backup
+    // It's assumed backupUsers returns the data needed; adjust as necessary.
     const backupData = await backupUsers(cognitoISP, userPoolId);
     console.log(`Backup completed for User Pool ID: ${userPoolId}`);
-
+    
     // Convert backup data to JSON string
     const backupJson = JSON.stringify(backupData);
 
