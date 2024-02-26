@@ -10,11 +10,6 @@ resource "aws_s3_bucket_versioning" "cognito_backup_bucket_versioning" {
   }
 }
 
-resource "aws_s3_bucket_acl" "cognito_backup_bucket_acl" {
-  bucket = aws_s3_bucket.cognito_backup_bucket.id
-  acl    = "private"
-}
-
 
 #Create a policy 
 resource "aws_iam_role" "lambda_execution_role" {
@@ -66,11 +61,11 @@ resource "aws_lambda_function" "cognito_backup" {
   function_name = "cognito_backup_function"
   role          = aws_iam_role.lambda_execution_role.arn
 
-  handler = "index.handler" // Assuming your file is named index.js and the export is named handler
-  runtime = "nodejs14.x"    // Use the appropriate Node.js runtime
+  handler       = "index.handler"
+  runtime       = "nodejs16.x" # Update this to a supported runtime, such as nodejs16.x, nodejs18.x, or nodejs20.x
 
-  s3_bucket = aws_s3_bucket.cognito_backup_bucket.id
-  s3_key    = "/lambda/package.zip"
+  s3_bucket     = var.s3_bucket_name
+  s3_key        = "/lambda/package.zip"
 
   environment {
     variables = {
