@@ -62,20 +62,30 @@ resource "aws_lambda_function" "cognito_backup" {
   role          = aws_iam_role.lambda_execution_role.arn
 
   handler       = "index.handler"
-  runtime       = "nodejs16.x" # Update this to a supported runtime, such as nodejs16.x, nodejs18.x, or nodejs20.x
+  runtime       = "nodejs16.x" # Make sure this is a supported runtime
 
-  s3_bucket     = var.s3_bucket_name
-  s3_key        = "/lambda/package.zip"
+  s3_bucket     = aws_s3_bucket.cognito_backup_bucket.bucket
+  s3_key        = "lambda/package.zip" # This should match the key used in the aws_s3_bucket_object resource below
 
   environment {
     variables = {
       USER_POOL_ID     = var.user_pool_id
-      S3_BUCKET_NAME   = var.s3_bucket_name
+      S3_BUCKET_NAME   = aws_s3_bucket.cognito_backup_bucket.bucket
       BACKUP_DIRECTORY = var.backup_directory
     }
   }
-   depends_on = [aws_iam_role.lambda_execution_role]
+  depends_on = [aws_iam_role.lambda_execution_role]
 }
+
+resource "aws_s3_bucket_object" "lambda_function_package" {
+  bucket = aws_s3_bucket.cognito_backup_bucket.bucket
+  key    = "lambda/package.zip"
+  source = "lambda/package.zip" # Update this path to where the package.zip is located on your local machine
+
+  # Optional: If your Lambda function package should be encrypted at rest
+  # server_side_encryption = "AES256"
+}
+ 
 
 # Create a schedule to run the backup usng a cloudwatch rule
 resource "aws_cloudwatch_event_rule" "daily_trigger" {
