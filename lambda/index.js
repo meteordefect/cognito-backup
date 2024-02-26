@@ -1,8 +1,8 @@
 const AWS = require('aws-sdk');
-const fs = require('fs');
+const { promises: fs } = require('fs');
+const path = require('path');
 const { backupUsers } = require('cognito-backup-restore');
 const s3 = new AWS.S3();
-const path = require('path');
 
 // Handler
 exports.handler = async (event) => {
@@ -10,25 +10,23 @@ exports.handler = async (event) => {
   const userPoolId = process.env.USER_POOL_ID;
   const s3BucketName = process.env.S3_BUCKET_NAME;
   const backupDirectory = process.env.BACKUP_DIRECTORY;
-  const backupFilePath = path.join('/tmp', `backup-${userPoolId}-${new Date().toISOString()}.json`);
+  // Generate a unique filename for the backup
+  const backupFileName = `backup-${userPoolId}-${new Date().toISOString()}.json`;
+  const backupFilePath = path.join('/tmp', backupFileName);
 
   try {
-    // Perform the backup to a file in /tmp
-    await backupUsers(cognitoISP, userPoolId, backupFilePath);
+    // Assuming backupUsers function now correctly handles writing to the specified file
+    const backupData = await backupUsers(cognitoISP, userPoolId, backupFilePath);
     console.log(`Backup completed for User Pool ID: ${userPoolId}`);
-    
-    // Read the backup file from /tmp
-    const backupData = fs.readFileSync(backupFilePath);
 
-    // Define S3 put parameters
+    // Upload the backup file to S3
+    const fileContent = await fs.readFile(backupFilePath);
     const putParams = {
       Bucket: s3BucketName,
-      Key: `${backupDirectory}${path.basename(backupFilePath)}`,
-      Body: backupData,
+      Key: `${backupDirectory}${backupFileName}`,
+      Body: fileContent,
       ContentType: 'application/json'
     };
-
-    // Save the backup to S3
     await s3.putObject(putParams).promise();
     console.log('Backup successfully saved to S3');
   } catch (error) {
@@ -37,7 +35,7 @@ exports.handler = async (event) => {
   } finally {
     // Clean up: Delete the temporary file
     try {
-      fs.unlinkSync(backupFilePath);
+      await fs.unlink(backupFilePath);
     } catch (err) {
       console.error('Error cleaning up the temporary file:', err);
     }
