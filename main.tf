@@ -1,7 +1,6 @@
 # Create and S3 bucket
 resource "aws_s3_bucket" "cognito_backup_bucket" {
   bucket = var.s3_bucket_name
-  acl    = "private"
 }
 
 resource "aws_s3_bucket_versioning" "cognito_backup_bucket_versioning" {
@@ -10,6 +9,12 @@ resource "aws_s3_bucket_versioning" "cognito_backup_bucket_versioning" {
     status = "Enabled"
   }
 }
+
+resource "aws_s3_bucket_acl" "cognito_backup_bucket_acl" {
+  bucket = aws_s3_bucket.cognito_backup_bucket.id
+  acl    = "private"
+}
+
 
 #Create a policy 
 resource "aws_iam_role" "lambda_execution_role" {
