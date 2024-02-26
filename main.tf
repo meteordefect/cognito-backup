@@ -80,10 +80,7 @@ resource "aws_lambda_function" "cognito_backup" {
 resource "aws_s3_object" "lambda_function_package" {
   bucket = aws_s3_bucket.cognito_backup_bucket.bucket
   key    = "lambda/package.zip"
-  source = "/lambda/package.zip" # Make sure this points to the correct path
-
-  # Optional: If your Lambda function package should be encrypted at rest
-  # server_side_encryption = "AES256"
+  source = "${path.module}/lambda/package.zip" # Corrected file path
 }
 
 
