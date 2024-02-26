@@ -11,5 +11,5 @@ variable "backup_directory" {
 variable "lambda_region" {
   description = "The AWS region where the Lambda function will be deployed."
   type        = string
-  default     = "us-east-1" // Default to us-east-1, you can change this to any region
+  default     = "ap-southeast-1" // Default to us-east-1, you can change this to any region
 }

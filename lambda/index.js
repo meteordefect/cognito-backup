@@ -1,62 +1,37 @@
-const { exec } = require('child_process');
 const AWS = require('aws-sdk');
-const fs = require('fs').promises;
-const path = require('path');
-
-const s3 = new AWS.S3({ region: process.env.REGION });
+const { backup } = require('cognito-backup-restore');
+const s3 = new AWS.S3();
 
 exports.handler = async (event) => {
-  const localBackupDirectory = `/tmp/backups/`;
+  const s3BucketName = process.env.S3_BUCKET_NAME;
+  const backupDirectory = process.env.BACKUP_DIRECTORY; // Ensure this ends with a "/"
   const timestamp = new Date().toISOString();
-  const s3BackupDirectory = `backups/${timestamp}/`;
 
   try {
-    await fs.mkdir(localBackupDirectory, { recursive: true });
+    // Assuming backup without specifying a user pool backs up all pools
+    const backupResults = await backup({
+      region: process.env.REGION,
+      directory: '/tmp', // Use /tmp for Lambda temporary storage
+    });
 
-    const command = `cbr backup --pool all --profile prod --region ${process.env.REGION} --dir ${localBackupDirectory}`;
-    await executeCommand(command);
-
-    const files = await fs.readdir(localBackupDirectory);
-
-    await Promise.all(files.map(async (file) => {
-      const filePath = path.join(localBackupDirectory, file);
+    // After backup, upload the result to S3
+    for (const result of backupResults) {
+      const fileName = result.fileName; // Or any appropriate identifier from the result
+      const filePath = `/tmp/${fileName}`;
       const fileContent = await fs.readFile(filePath);
-      const s3Key = `${s3BackupDirectory}${file}`;
 
-      await uploadToS3(fileContent, s3Key);
-      console.log(`Uploaded ${file} to S3.`);
-    }));
+      const s3Key = `${backupDirectory}${timestamp}/${fileName}`;
+      await s3.upload({
+        Bucket: s3BucketName,
+        Key: s3Key,
+        Body: fileContent,
+        ContentType: 'application/json',
+      }).promise();
 
-    console.log('Backup completed successfully.');
+      console.log(`Uploaded ${fileName} to S3 bucket ${s3BucketName} at key ${s3Key}.`);
+    }
   } catch (error) {
     console.error('Error during backup process:', error);
-    throw error;
+    throw error; // Rethrow to mark the Lambda execution as failed
   }
 };
-
-function executeCommand(command) {
-  return new Promise((resolve, reject) => {
-    exec(command, (error, stdout, stderr) => {
-      if (error) {
-        console.error('Error executing command:', error);
-        reject(error);
-      } else if (stderr) {
-        console.error('Error output from command:', stderr);
-        reject(new Error(stderr));
-      } else {
-        console.log('Command output:', stdout);
-        resolve();
-      }
-    });
-  });
-}
-
-function uploadToS3(data, key) {
-  const params = {
-    Bucket: process.env.S3_BUCKET_NAME,
-    Key: key,
-    Body: data,
-    ContentType: 'application/json'
-  };
-  return s3.upload(params).promise();
-}
