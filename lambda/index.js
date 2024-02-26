@@ -38,4 +38,8 @@ exports.handler = async (event) => {
     // Clean up: Delete the temporary file
     try {
       fs.unlinkSync(backupFilePath);
-    } catch (
+    } catch (err) {
+      console.error('Error cleaning up the temporary file:', err);
+    }
+  }
+};
