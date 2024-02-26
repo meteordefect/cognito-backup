@@ -74,6 +74,7 @@ resource "aws_lambda_function" "cognito_backup" {
       BACKUP_DIRECTORY = var.backup_directory
     }
   }
+   depends_on = [aws_iam_role.lambda_execution_role]
 }
 
 # Create a schedule to run the backup usng a cloudwatch rule
