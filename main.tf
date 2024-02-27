@@ -5,7 +5,7 @@ resource "aws_s3_bucket" "cognito_backup_bucket" {
 
 resource "aws_s3_bucket_versioning" "cognito_backup_bucket_versioning" {
   bucket = aws_s3_bucket.cognito_backup_bucket.id
-  versioning {
+  versioning_configuration {
     status = "Suspended"
   }
 }
