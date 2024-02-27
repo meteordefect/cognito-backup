@@ -75,7 +75,7 @@ resource "aws_lambda_function" "cognito_backup" {
       USER_POOL_ID     = var.user_pool_id
     }
   }
-  depends_on = [aws_iam_role.lambda_execution_role]
+  depends_on = [aws_s3_object.lambda_function_package]
 }
 
 resource "aws_s3_object" "lambda_function_package" {
