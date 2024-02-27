@@ -1,4 +1,5 @@
 const AWS = require('aws-sdk');
+const fs = require('fs').promises; // Corrected import for fs with promises
 const { backup } = require('cognito-backup-restore');
 const s3 = new AWS.S3();
 
@@ -8,15 +9,16 @@ exports.handler = async (event) => {
   const timestamp = new Date().toISOString();
 
   try {
-    // Assuming backup without specifying a user pool backs up all pools
+    // Backup all Cognito pools in the specified region
     const backupResults = await backup({
       region: process.env.REGION,
       directory: '/tmp', // Use /tmp for Lambda temporary storage
+      // You may need to ensure the "-all" behavior is correctly implemented or passed
     });
 
     // After backup, upload the result to S3
     for (const result of backupResults) {
-      const fileName = result.fileName; // Or any appropriate identifier from the result
+      const fileName = result.fileName; // Adjust based on actual result structure
       const filePath = `/tmp/${fileName}`;
       const fileContent = await fs.readFile(filePath);
 

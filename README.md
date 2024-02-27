@@ -2,11 +2,12 @@
 
 ## Overview
 
-This simple AWS lambda functon will do a daily backup of your AWS cognito user pool to an S3 bucket. It uses the CBR backup tool which also has the ability to restore from the backup file.
+This simple AWS lambda functon will do a daily backup of your AWS cognito user pool to an S3 bucket. It uses the CBR backup tool which also has the ability to restore from the backup file. Currently there is no backup option provided by AWS for cognito.
 
 You can read more about CBR backup usage here: 
 
-https://medium.com/geekculture/how-to-quickly-backup-and-restore-aws-cognito-user-pool-c1d820b927a8
+https://github.com/rahulpsd18/cognito-backup-restore/tree/master
+
 
 Here is the main npm repo:
 
