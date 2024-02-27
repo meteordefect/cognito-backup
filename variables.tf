@@ -13,3 +13,7 @@ variable "lambda_region" {
   type        = string
   default     = "ap-southeast-1" // Default to us-east-1, you can change this to any region
 }
+
+variable "user_pool_id" { 
+  type = string
+}

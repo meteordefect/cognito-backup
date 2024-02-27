@@ -15,16 +15,25 @@ https://www.npmjs.com/package/cognito-backup-restore
 
 
 ## Instructions
-Navitage to the cognito-backup folder and do a few things. 
+Navitage to the cognito-backup folder and do a few things:
 
-- Add your unique bucket name and congnito pool name to the terraform.tfvars
+Add your unique bucket name and congnito pool name to the terraform.tfvars
 ```
 user_pool_id     = "your-userpool-id"
 s3_bucket_name   = "your-s3-bucket-name"
 backup_directory = "path/to/backup/directory"
 ```
+
+
 Do a terraform plan and apply
 ```
 terraform plan
 terraform apply
 ``` 
+
+# Lambda Pre-Build
+
+The lambda has been pre build and zipped with its node_modules dependeies. If you need to rebuild it you can navigate to the /lambda folder and issue 
+```
+npm install
+```

@@ -72,6 +72,7 @@ resource "aws_lambda_function" "cognito_backup" {
       S3_BUCKET_NAME   = aws_s3_bucket.cognito_backup_bucket.bucket
       BACKUP_DIRECTORY = var.backup_directory
       REGION           = var.lambda_region
+      USER_POOL_ID     = var.user_pool_id
     }
   }
   depends_on = [aws_iam_role.lambda_execution_role]
