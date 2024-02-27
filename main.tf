@@ -75,6 +75,8 @@ resource "aws_lambda_function" "cognito_backup" {
       USER_POOL_ID     = var.user_pool_id
     }
   }
+  
+  timeout       = 900 # Increase the timeout up to the maximum of 15 minutes
   depends_on = [aws_s3_object.lambda_function_package]
 }
 

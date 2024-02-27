@@ -18,6 +18,7 @@ lambda_region = "us-west-2"
 
 Do a terraform plan and apply
 ```
+terraform init
 terraform plan
 terraform apply
 ``` 
