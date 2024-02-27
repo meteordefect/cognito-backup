@@ -22,12 +22,12 @@ terraform plan
 terraform apply
 ``` 
 
-BAckuos will then be places in the s3 bucket in a folder named with the timestamp of the backup. 
+Backups will then be placed in the s3 bucket in a folder named as per the current timestap at time of storage.  
 
 
 # Lambda Pre-Build
 
-The lambda has been pre build and zipped with its node_modules dependeies. If you need to rebuild it you can navigate to the /lambda folder and issue 
+The lambda has been pre built and zipped with its node_modules dependencies. If you need to rebuild it you can navigate to the /lambda folder and issue 
 ```
 npm install
 ```
